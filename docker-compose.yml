@@ -25,9 +25,9 @@ services:
     container_name: musicshare_backend
     restart: always
     ports:
-      - "${BACKEND_PORT:-3003}:3003"
+      - "${BACKEND_PORT}:3003"
     environment:
-      PORT: 3003
+      PORT: ${BACKEND_PORT}
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     env_file: ./backend/.env
     volumes:
@@ -36,6 +36,19 @@ services:
     depends_on:
       db:
         condition: service_healthy
-
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: musicshare_frontend
+    restart: always
+    ports:
+      - "${FRONTEND_PORT}:5173"
+    env_file: ./frontend/.env
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
 volumes:
   pgdata:
